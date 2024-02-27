@@ -2,26 +2,15 @@
 #include <stdlib.h>
 
 typedef struct node *node;
-int n;  // Declare the number of nodes
-node A; // Declare A as a pointer to an array of struct node
+int n;          // Declare the number of nodes
+struct node *A; // Declare A as a pointer to an array of struct node
 
 struct node
 {
     int v;
-    node child;
-    node brother;
+    struct node *child;
+    struct node *brother;
 };
-
-node A_creation(node *A, int n)
-{
-    for (int i = 0; i < n; i++)
-    {
-        A[i] = (node)calloc(1, sizeof(struct node)); // Allocate and initialize each node
-        A[i]->v = -1;                                // As per your document, initial v should be -1
-        A[i]->child = NULL;
-        A[i]->brother = NULL;
-    }
-}
 
 int ptr2loc(node v, node A)
 {
@@ -32,9 +21,8 @@ int ptr2loc(node v, node A)
     return (int)r;
 }
 
-void S(node v, node A)
+void S(node v)
 {
-    int f;
     if (NULL == v)
         printf("NULL\n");
     else
@@ -95,46 +83,52 @@ resulting tree.
 }
 */
 
-int main() 
+int main()
 {
     scanf("%d", &n);
     getchar();
 
-    node *A = (node *)calloc(n, sizeof(struct node));
-    if(!A){
+    A = (struct node *)calloc(n, sizeof(struct node)); // A is a pointer to the struct nodes
+    if (!A)
+    {
         fprintf(stderr, "memory allocation failed\n");
         return 1;
     }
 
-    printf(A);
-    A_creation(A, n);
+    for (int i = 0; i < n; i++)
+    {
+        A[i].v = -1; // Initialize each struct node
+        A[i].child = NULL;
+        A[i].brother = NULL;
+    }
 
     char input;
     int index, new_v;
 
-    while (scanf(" %c", &input) && input != 'X') { // _%c tells scanf to skip any whitespace characters before reading a character.  
-        switch (input) {
-            case 'S':
-                scanf("%d", &index);    
-                S(A[index], A);
-                break;
-            case 'V':
-                scanf("%d %d", &index, &new_v);
-                V(A[index], new_v);
-                break;
-            // Add cases for other commands: P, U, R, M, E
-            default:
-                // Handle unknown command or consume extra characters
-                break;
+    while (scanf(" %c", &input) && input != 'X')
+    { // _%c tells scanf to skip any whitespace characters before reading a character.
+        switch (input)
+        {
+        case 'S':
+            scanf("%d", &index);
+            S(&A[index]);         // &A[index] provides the address of the index-th element in the array A of struct node. You need to use the address (or the pointer to the node) when you want to pass a node to a function and allow that function to modify the original node in the array. 
+            break;
+        case 'V':
+            scanf("%d %d", &index, &new_v);
+            // V(A[index], new_v);
+            break;
+        // Add cases for other commands: P, U, R, M, E
+        default:
+            // Handle unknown command or consume extra characters
+            break;
         }
     }
-        // Cleanup
-    for (int i = 0; i < n; i++) {
-        free(A[i]); // Free each node
+    // Cleanup
+    for (int i = 0; i < n; i++)
+    {
+        free(&A[i]); // Free each node
     }
     free(A); // Free the array of pointers
 
     return 0;
 }
-
-
