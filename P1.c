@@ -95,7 +95,7 @@ resulting tree.
 }
 */
 
-int main()
+int main() 
 {
     scanf("%d", &n);
     getchar();
@@ -106,32 +106,28 @@ int main()
         return 1;
     }
 
+    printf(A);
     A_creation(A, n);
-
 
     char input;
     int index, new_v;
 
-    while (scanf("%c ", &input) && input != 'X') {
+    while (scanf(" %c", &input) && input != 'X') { // _%c tells scanf to skip any whitespace characters before reading a character.  
         switch (input) {
             case 'S':
-                scanf("%d ", &index);
-                printf("%c %d\n", input, index);       
-                //S(A[index], A);
+                scanf("%d", &index);    
+                S(A[index], A);
                 break;
             case 'V':
                 scanf("%d %d", &index, &new_v);
-                printf("%c %d %d\n", input, index, new_v);
-                //V(A[index], new_v);
+                V(A[index], new_v);
                 break;
             // Add cases for other commands: P, U, R, M, E
             default:
                 // Handle unknown command or consume extra characters
                 break;
         }
-        getchar(); // Clear the newline character after each command
     }
-
         // Cleanup
     for (int i = 0; i < n; i++) {
         free(A[i]); // Free each node
