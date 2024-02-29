@@ -1,15 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 typedef struct node *node;
-int n;          // Declare the number of nodes
-struct node *A; // Declare A as a pointer to an array of struct node
+int n;
+struct node *A;
 
 struct node
 {
-    int v;
-    struct node *child;
-    struct node *brother;
+    int v;                  //              0  
+    struct node *child;     //            (   )
+    struct node *brother;   //  child -> 0     0 <- brother
 };
 
 int ptr2loc(node v, node A)
@@ -21,7 +22,7 @@ int ptr2loc(node v, node A)
     return (int)r;
 }
 
-void showNode(node v)
+void showNode(node v) // 'S'
 {
     if (NULL == v)
         printf("NULL\n");
@@ -35,14 +36,13 @@ void showNode(node v)
     }
 }
 
-void showList(node current)
+void showList(node current) // 'P' When called is supposed to display the child and all the brothers, if any.
 {
     /*The showList function that gives a description of the brother
 list at a node, i.e., it calls showNode for the current node and then
 recursively calls showList on the brother node if the current v value is
 not negative.*/
-    /////////////////// So we want it to be negative?
-
+    
     showNode(current);
     if (current->v >= 0)
     {
@@ -51,15 +51,22 @@ not negative.*/
     }
 }
 
-void Set(node node, int new_v)
+void Set(node current, int new_v) // 'V' if node is a root, sets it to NULL. Else brother->root.
 {
     /*The Set function that changes the v field of the current node.
 Note that this function can only be executed when the node is a heap
 by itself, i.e., its child and brother fields are all NULL. The function
 must receive a positive value v, but stores its negative correspondent.*/
-    if (node == NULL) return 1;
 
-    
+    // Base case: empty tree is a valid min-heap
+    if (current == NULL)
+    {
+        current->v = new_v;
+        return true;
+    }
+
+    // Recursively check subtrees
+    return Set(current->child) && Set(current->brother);
 }
 
 /*
