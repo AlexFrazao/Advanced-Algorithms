@@ -21,7 +21,7 @@ int ptr2loc(node v, node A)
     return (int)r;
 }
 
-void S(node v)
+void showNode(node v)
 {
     if (NULL == v)
         printf("NULL\n");
@@ -35,27 +35,34 @@ void S(node v)
     }
 }
 
-/*void P(node)
+void showList(node current)
 {
     /*The showList function that gives a description of the brother
 list at a node, i.e., it calls showNode for the current node and then
 recursively calls showList on the brother node if the current v value is
-not negative.
+not negative.*/
+    /////////////////// So we want it to be negative?
+
+    showNode(current);
+    if (current->v >= 0)
+    {
+        current->v -= 1;
+        showList(current);
+    }
 }
 
-void V(node node_to_be_changed, int new_v)
+void Set(node node, int new_v)
 {
+    /*The Set function that changes the v field of the current node.
+Note that this function can only be executed when the node is a heap
+by itself, i.e., its child and brother fields are all NULL. The function
+must receive a positive value v, but stores its negative correspondent.*/
+    if (node == NULL) return 1;
 
-    if (new_v >= 0)
-    {
-        node_to_be_changed->v = new_v;
-    }
-    else
-    {
-        node_to_be_changed->v = abs(new_v);
-    }
+    
 }
 
+/*
 void U(heap, heap)
 { /*The Meld function is used to join two heaps, i.e., merge
 the two roots into a single tree. This function returns the root of the
@@ -111,12 +118,16 @@ int main()
         {
         case 'S':
             scanf("%d", &index);
-            S(&A[index]);         // &A[index] provides the address of the index-th element in the array A of struct node. You need to use the address (or the pointer to the node) when you want to pass a node to a function and allow that function to modify the original node in the array. 
+            showNode(&A[index]); // &A[index] provides the address of the index-th element in the array A of struct node. You need to use the address (or the pointer to the node) when you want to pass a node to a function and allow that function to modify the original node in the array.
             break;
         case 'V':
             scanf("%d %d", &index, &new_v);
-            // V(A[index], new_v);
+            Set(A[index], new_v);
             break;
+        case 'P':
+            scanf("%d", &index);
+            showList(index);
+
         // Add cases for other commands: P, U, R, M, E
         default:
             // Handle unknown command or consume extra characters
