@@ -3,14 +3,15 @@
 #include <stdbool.h>
 
 typedef struct node *node;
+typedef struct node *heap;
 int n;
 struct node *A;
 
 struct node
 {
-    int v;                  //              0  
-    struct node *child;     //            (   )
-    struct node *brother;   //  child -> 0     0 <- brother
+    int v;                //              0
+    struct node *child;   //            (   )
+    struct node *brother; //  child -> 0     0 <- brother
 };
 
 int ptr2loc(node v, node A)
@@ -21,6 +22,30 @@ int ptr2loc(node v, node A)
         r = ((size_t)v - (size_t)A) / sizeof(struct node); // size_t retrieves the size of an array // this computation retrieves the byte difference between the node being tested and A
     return (int)r;
 }
+
+void vizShow(FILE *f, int n)
+{
+    int i;
+    fprintf(f, "digraph {\n");
+    for (i = 0; i < n; i++)
+    {
+        fprintf(f, "A%d [label=\"A%d.v=%d\"]\n",
+                i, i, A[i].v);
+    }
+    for (i = 0; i < n; i++)
+    {
+        if (NULL != A[i].child)
+            fprintf(f, "A%d -> A%d [label=\"ch\"]\n",
+                    i, ptr2loc(A[i].child, A));
+        if (NULL != A[i].brother)
+            fprintf(f, "A%d -> A%d [label=\"%s\"]\n",
+                    i, ptr2loc(A[i].brother, A),
+                    (0 < A[i].v) ? "br" : "f");
+    }
+    fprintf(f, "}\n");
+}
+
+
 
 void showNode(node v) // 'S'
 {
@@ -36,46 +61,56 @@ void showNode(node v) // 'S'
     }
 }
 
-void showList(node current) // 'P' When called is supposed to display the child and all the brothers, if any.
+void showList(node current) // 'P'
 {
-    /*The showList function that gives a description of the brother
-list at a node, i.e., it calls showNode for the current node and then
-recursively calls showList on the brother node if the current v value is
-not negative.*/
-    
-    showNode(current);
-    if (current->v >= 0)
+    // When called is supposed to display the child and all the brothers, if any.
+
+    while (current != NULL)
     {
-        current->v -= 1;
-        showList(current);
+        showNode(current);
+        current = current->brother;
     }
 }
 
-void Set(node current, int new_v) // 'V' if node is a root, sets it to NULL. Else brother->root.
+void Set(node node, int new_v) // 'V'
 {
-    /*The Set function that changes the v field of the current node.
-Note that this function can only be executed when the node is a heap
-by itself, i.e., its child and brother fields are all NULL. The function
-must receive a positive value v, but stores its negative correspondent.*/
-
-    // Base case: empty tree is a valid min-heap
-    if (current == NULL)
+    // if node is a root, sets it to NULL. Else brother->root.
+    if (node != NULL && node->child == NULL && node->brother == NULL)
     {
-        current->v = new_v;
-        return true;
+        node->v = -new_v;
     }
+    else
+    {
+        node->brother = node;
+    }
+}
 
-    // Recursively check subtrees
-    return Set(current->child) && Set(current->brother);
+int Meld(heap q1, heap q2) // 'U'
+{ 
+    /*The Meld function is used to join two heaps, i.e., merge
+the two roots into a single tree. This function returns the root of the
+resulting tree.*/
+    int root_index;
+    if (q1->v < q2->v){
+        q1->brother = q2->child;
+        q2->child = q1; 
+        root_index = ptr2loc(q2, A);
+
+        printf("Swap A[%d] and A[%d]\n", ptr2loc(q1,A), ptr2loc(q2,A));
+        printf("Meld A[%d] A[%d]\n", ptr2loc(q2,A), ptr2loc(q1,A));
+
+    } else{
+        q2->brother = q1->child;
+        q1->child = q2;
+        root_index = ptr2loc(q1, A);
+
+        printf("Meld A[%d] A[%d]\n", ptr2loc(q1,A), ptr2loc(q2,A));
+        
+    }
+    return root_index;
 }
 
 /*
-void U(heap, heap)
-{ /*The Meld function is used to join two heaps, i.e., merge
-the two roots into a single tree. This function returns the root of the
-resulting tree.
-}
-
 void R(root, node, v)
 { /*The DecreaseKey function is used to decrease the v
 field of the current node. This node may be part of a meldable heap
@@ -99,6 +134,12 @@ resulting tree.
 
 int main()
 {
+    FILE *f = fopen("heap_graph.dot", "w");
+    if (!f) {
+        fprintf(stderr, "Failed to open graph file for writing.\n");
+        return 1;
+    }
+
     scanf("%d", &n);
     getchar();
 
@@ -117,7 +158,7 @@ int main()
     }
 
     char input;
-    int index, new_v;
+    int index, index1, index2, new_v;
 
     while (scanf(" %c", &input) && input != 'X')
     { // _%c tells scanf to skip any whitespace characters before reading a character.
@@ -125,15 +166,21 @@ int main()
         {
         case 'S':
             scanf("%d", &index);
-            showNode(&A[index]); // &A[index] provides the address of the index-th element in the array A of struct node. You need to use the address (or the pointer to the node) when you want to pass a node to a function and allow that function to modify the original node in the array.
+            showNode(&A[index]); //&A so we can handle the actual node
             break;
         case 'V':
             scanf("%d %d", &index, &new_v);
-            Set(A[index], new_v);
+            Set(&A[index], new_v);
             break;
         case 'P':
             scanf("%d", &index);
-            showList(index);
+            showList(&A[index]);
+            break;
+        case 'U':
+            scanf("%d %d", &index1, &index2);
+            Meld(&A[index1], &A[index2]);
+            break;
+            
 
         // Add cases for other commands: P, U, R, M, E
         default:
@@ -141,11 +188,9 @@ int main()
             break;
         }
     }
-    // Cleanup
-    for (int i = 0; i < n; i++)
-    {
-        free(&A[i]); // Free each node
-    }
+
+    vizShow(f,n);
+    fclose(f);
     free(A); // Free the array of pointers
 
     return 0;
