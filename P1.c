@@ -45,7 +45,20 @@ void vizShow(FILE *f, int n)
     fprintf(f, "}\n");
 }
 
+static void link(node f, node c){
+    f->child = c;
+    c->brother = f;
+    printf("link A[%d] as child of A[%d]\n", ptr2loc(c, A), ptr2loc(f, A));
+}
 
+/*void getHook(node root, node node){
+    
+    int target = node;
+    while (target != node->brother){ 
+        node = node->brother;
+    }
+    node->brother = root;
+}*/
 
 void showNode(node v) // 'S'
 {
@@ -72,17 +85,18 @@ void showList(node current) // 'P'
     }
 }
 
-void Set(node node, int new_v) // 'V'
+void Set(node p, int x) // 'V'
 {
-    // if node is a root, sets it to NULL. Else brother->root.
-    if (node != NULL && node->child == NULL && node->brother == NULL)
+    // if p is a root, sets it to NULL. Else brother->root.
+    if (p != NULL && p->child == NULL && p->brother == NULL)
     {
-        node->v = -new_v;
+        p->v = -x;
     }
     else
     {
-        node->brother = node;
+        p->brother = p;
     }
+    printf("set A[%d] to %d\n", ptr2loc(p,A), x);
 }
 
 int Meld(heap q1, heap q2) // 'U'
@@ -91,34 +105,58 @@ int Meld(heap q1, heap q2) // 'U'
 the two roots into a single tree. This function returns the root of the
 resulting tree.*/
     int root_index;
-    if (q1->v < q2->v){
-        q1->brother = q2->child;
-        q2->child = q1; 
-        root_index = ptr2loc(q2, A);
-
+    if (q1->v > q2->v){
+        link(q2, q1);
         printf("Swap A[%d] and A[%d]\n", ptr2loc(q1,A), ptr2loc(q2,A));
         printf("Meld A[%d] A[%d]\n", ptr2loc(q2,A), ptr2loc(q1,A));
-
-    } else{
-        q2->brother = q1->child;
-        q1->child = q2;
         root_index = ptr2loc(q1, A);
-
+    } else{
+        link(q1, q2);
         printf("Meld A[%d] A[%d]\n", ptr2loc(q1,A), ptr2loc(q2,A));
-        
+        root_index = ptr2loc(q2, A);
     }
     return root_index;
 }
 
-/*
-void R(root, node, v)
-{ /*The DecreaseKey function is used to decrease the v
-field of the current node. This node may be part of a meldable heap
-tree and therefore this operation might need modify this tree. The
-root of the corresponding tree must be given as the first argument to
-this function.
+void decreaseKey(node root, node node, int v) // 'R'
+{ 
+/*  1:assumes that the first argument is the root of
+the tree that contains the second argument.
+    
+    2: assumes that
+the argument value of v is indeed smaller that the represented value in the
+argument node.
+    
+    3: If both the node and root arguments are equal then we are
+decreasing the value at the root, which is a simple matter of changing the
+value.
+    
+    4: Otherwise getHook function is called. getHook traverses the connected 
+    nodes until it finds the link that points to the desired node, so we know what
+    to cut.
+    
+    5: The respective pointer is altered, so that the
+sub-tree rooted at the node becomes separate from the original tree.
+    
+    6: Then the v value is decreased
+
+    7: In calling the Meld function the original root is used
+as first argument and the node (now also a root) as the second argument.
+    
+    8: In both cases the return value is the root of the resulting heap tree.
+    
+    9: An important detail to consider is when the argument node is the only
+child of its parent node. In this case the respective child pointer should
+be set to NULL.     */
+
+    if (root == node){
+        root->v = v;
+    }else{
+        /*getHook(root, node);*/
+    }
 }
 
+/*
 void M(node)
 { /*The Min function returns the absolute value of v for the cur-
 rent node. When the argument node is a root the result is the heap
@@ -164,21 +202,28 @@ int main()
     { // _%c tells scanf to skip any whitespace characters before reading a character.
         switch (input)
         {
-        case 'S':
+        case 'S': // showNode
             scanf("%d", &index);
             showNode(&A[index]); //&A so we can handle the actual node
             break;
-        case 'V':
+        case 'V': // Set
             scanf("%d %d", &index, &new_v);
             Set(&A[index], new_v);
             break;
-        case 'P':
+        case 'P': // showList
             scanf("%d", &index);
             showList(&A[index]);
             break;
-        case 'U':
+        case 'U': // Meld
             scanf("%d %d", &index1, &index2);
-            Meld(&A[index1], &A[index2]);
+            int root = Meld(&A[index1], &A[index2]);
+            printf("The root of the resulting tree is A[%d]", root);
+            break;
+        case 'R': // decreaseKey
+            break;
+        case 'M': // Min
+            break;
+        case 'E': // ExtractMin
             break;
             
 
@@ -192,6 +237,9 @@ int main()
     vizShow(f,n);
     fclose(f);
     free(A); // Free the array of pointers
+
+    system("dot -Tpng heap_graph.dot -o heap_graph.png");
+    system("xdg-open heap_graph.png");
 
     return 0;
 }

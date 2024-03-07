@@ -1,6 +1,7 @@
 digraph {
 A0 [label="A0.v=-1"]
 A1 [label="A1.v=-2"]
-A0 -> A1 [label="ch"]
-A1 -> A1 [label="f"]
+A2 [label="A2.v=-1"]
+A1 -> A2 [label="ch"]
+A2 -> A1 [label="f"]
 }
