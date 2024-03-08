@@ -45,12 +45,6 @@ void vizShow(FILE *f, int n)
     fprintf(f, "}\n");
 }
 
-static void link(node f, node c){
-    f->child = c;
-    c->brother = f;
-    printf("link A[%d] as child of A[%d]\n", ptr2loc(c, A), ptr2loc(f, A));
-}
-
 /*void getHook(node root, node node){
     
     int target = node;
@@ -77,7 +71,6 @@ void showNode(node v) // 'S'
 void showList(node current) // 'P'
 {
     // When called is supposed to display the child and all the brothers, if any.
-
     while (current != NULL)
     {
         showNode(current);
@@ -99,6 +92,29 @@ void Set(node p, int x) // 'V'
     printf("set A[%d] to %d\n", ptr2loc(p,A), x);
 }
 
+static void link(node f, node c){
+    
+    if (f->child == NULL){
+        f->child = c;
+        c->brother = f;
+    }
+    else if(f->child->brother == f){
+        f->child->v = f->child->v * -1; 
+        f->child->brother = c;
+        c->brother = f;  
+    }
+    else if(f->child->brother != NULL){
+        node bro = f->child->brother;
+        while (bro->brother != f){
+            bro = bro->brother;
+        }
+        bro->v = bro->v * -1;
+        bro->brother = c;
+        c->brother = f;
+    }
+    printf("link A[%d] as child of A[%d]\n", ptr2loc(c, A), ptr2loc(f, A));
+}
+
 int Meld(heap q1, heap q2) // 'U'
 { 
     /*The Meld function is used to join two heaps, i.e., merge
@@ -109,11 +125,11 @@ resulting tree.*/
         link(q2, q1);
         printf("Swap A[%d] and A[%d]\n", ptr2loc(q1,A), ptr2loc(q2,A));
         printf("Meld A[%d] A[%d]\n", ptr2loc(q2,A), ptr2loc(q1,A));
-        root_index = ptr2loc(q1, A);
+        root_index = ptr2loc(q2, A);
     } else{
         link(q1, q2);
         printf("Meld A[%d] A[%d]\n", ptr2loc(q1,A), ptr2loc(q2,A));
-        root_index = ptr2loc(q2, A);
+        root_index = ptr2loc(q1, A);
     }
     return root_index;
 }
@@ -147,7 +163,7 @@ as first argument and the node (now also a root) as the second argument.
     
     9: An important detail to consider is when the argument node is the only
 child of its parent node. In this case the respective child pointer should
-be set to NULL.     */
+be set to NULL. */
 
     if (root == node){
         root->v = v;
@@ -217,7 +233,7 @@ int main()
         case 'U': // Meld
             scanf("%d %d", &index1, &index2);
             int root = Meld(&A[index1], &A[index2]);
-            printf("The root of the resulting tree is A[%d]", root);
+            printf("The root of the resulting tree is A[%d]\n", root);
             break;
         case 'R': // decreaseKey
             break;
