@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <math.h>
 
 typedef struct node *node;
 typedef struct node *heap;
@@ -45,14 +46,24 @@ void vizShow(FILE *f, int n)
     fprintf(f, "}\n");
 }
 
-/*void getHook(node root, node node){
-    
-    int target = node;
-    while (target != node->brother){ 
-        node = node->brother;
+int getHook(node root, node n){
+    /* 
+    4: getHook traverses the connected 
+    nodes until it finds the link that points to the desired node, so we know what
+    to cut.
+    */
+   node pre_n = n;
+    while (n != pre_n->brother){ 
+        pre_n = pre_n->brother;
+        if (pre_n == root){
+            if(n == root->child){
+                break;
+            }
+            pre_n = root->child;   
+        }
     }
-    node->brother = root;
-}*/
+    return &pre_n;
+}
 
 void showNode(node v) // 'S'
 {
@@ -93,24 +104,15 @@ void Set(node p, int x) // 'V'
 }
 
 static void link(node f, node c){
-    
+
     if (f->child == NULL){
         f->child = c;
         c->brother = f;
     }
-    else if(f->child->brother == f){
-        f->child->v = f->child->v * -1; 
-        f->child->brother = c;
-        c->brother = f;  
-    }
-    else if(f->child->brother != NULL){
-        node bro = f->child->brother;
-        while (bro->brother != f){
-            bro = bro->brother;
-        }
-        bro->v = bro->v * -1;
-        bro->brother = c;
-        c->brother = f;
+    else{
+        c->brother = f->child;
+        f->child = c;
+        f->child->v = abs(c->v);
     }
     printf("link A[%d] as child of A[%d]\n", ptr2loc(c, A), ptr2loc(f, A));
 }
@@ -118,10 +120,10 @@ static void link(node f, node c){
 int Meld(heap q1, heap q2) // 'U'
 { 
     /*The Meld function is used to join two heaps, i.e., merge
-the two roots into a single tree. This function returns the root of the
+the two 'ROOTS' into a single tree. This function returns the root of the
 resulting tree.*/
     int root_index;
-    if (q1->v > q2->v){
+    if (abs(q1->v) > abs(q2->v)){
         link(q2, q1);
         printf("Swap A[%d] and A[%d]\n", ptr2loc(q1,A), ptr2loc(q2,A));
         printf("Meld A[%d] A[%d]\n", ptr2loc(q2,A), ptr2loc(q1,A));
@@ -134,23 +136,9 @@ resulting tree.*/
     return root_index;
 }
 
-void decreaseKey(node root, node node, int v) // 'R'
+void decreaseKey(node root, node n, int v) // 'R'
 { 
-/*  1:assumes that the first argument is the root of
-the tree that contains the second argument.
-    
-    2: assumes that
-the argument value of v is indeed smaller that the represented value in the
-argument node.
-    
-    3: If both the node and root arguments are equal then we are
-decreasing the value at the root, which is a simple matter of changing the
-value.
-    
-    4: Otherwise getHook function is called. getHook traverses the connected 
-    nodes until it finds the link that points to the desired node, so we know what
-    to cut.
-    
+/*  
     5: The respective pointer is altered, so that the
 sub-tree rooted at the node becomes separate from the original tree.
     
@@ -160,16 +148,23 @@ sub-tree rooted at the node becomes separate from the original tree.
 as first argument and the node (now also a root) as the second argument.
     
     8: In both cases the return value is the root of the resulting heap tree.
-    
+
     9: An important detail to consider is when the argument node is the only
 child of its parent node. In this case the respective child pointer should
 be set to NULL. */
 
-    if (root == node){
+    if (root->v == n->v){
         root->v = v;
-    }else{
-        /*getHook(root, node);*/
+    }else if(n == root->child && root == n->brother){
+        root->child = NULL;
+        root->v = v;  //-------------------> Is the value of the root that is decreased right?
     }
+    else{
+        node pre_n = getHook(root, n);
+        pre_n->brother = n->brother;
+        root->v = v;  //-------------------> Is the value of the root that is decreased right?
+    }
+    Meld(root, n);
 }
 
 /*
