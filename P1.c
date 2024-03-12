@@ -46,7 +46,7 @@ void vizShow(FILE *f, int n)
     fprintf(f, "}\n");
 }
 
-int getHook(node root, node n){
+node getHook(node root, node n){
     /* 
     4: getHook traverses the connected 
     nodes until it finds the link that points to the desired node, so we know what
@@ -62,7 +62,7 @@ int getHook(node root, node n){
             pre_n = root->child;   
         }
     }
-    return &pre_n;
+    return pre_n;
 }
 
 void showNode(node v) // 'S'
@@ -136,7 +136,7 @@ resulting tree.*/
     return root_index;
 }
 
-void decreaseKey(node root, node n, int v) // 'R'
+int decreaseKey(node root, node n, int v) // 'R'
 { 
 /*  
     5: The respective pointer is altered, so that the
@@ -152,19 +152,23 @@ as first argument and the node (now also a root) as the second argument.
     9: An important detail to consider is when the argument node is the only
 child of its parent node. In this case the respective child pointer should
 be set to NULL. */
-
+    int p;
     if (root->v == n->v){
         root->v = v;
+        p = ptr2loc(root, A);
     }else if(n == root->child && root == n->brother){
         root->child = NULL;
-        root->v = v;  //-------------------> Is the value of the root that is decreased right?
+        n->v = v;
+        p = ptr2loc(root, A);
     }
     else{
         node pre_n = getHook(root, n);
         pre_n->brother = n->brother;
-        root->v = v;  //-------------------> Is the value of the root that is decreased right?
+        n->v = v;
+        p = ptr2loc(root, A);
     }
     Meld(root, n);
+    return p;
 }
 
 /*
@@ -231,12 +235,15 @@ int main()
             printf("The root of the resulting tree is A[%d]\n", root);
             break;
         case 'R': // decreaseKey
+            scanf("%d %d %d", &index1, &index2, &new_v);
+            int p = decreaseKey(&A[index1], &A[index2], new_v);
+            printf("decKey A[%d] to %d\n", p, new_v);
             break;
         case 'M': // Min
             break;
         case 'E': // ExtractMin
             break;
-            
+
 
         // Add cases for other commands: P, U, R, M, E
         default:
