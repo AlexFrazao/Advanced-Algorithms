@@ -46,20 +46,24 @@ void vizShow(FILE *f, int n)
     fprintf(f, "}\n");
 }
 
-node getHook(node root, node n){
-    /* 
-    4: getHook traverses the connected 
+node getHook(node root, node n)
+{
+    /*
+    4: getHook traverses the connected
     nodes until it finds the link that points to the desired node, so we know what
     to cut.
     */
-   node pre_n = n;
-    while (n != pre_n->brother){ 
+    node pre_n = n;
+    while (n != pre_n->brother)
+    {
         pre_n = pre_n->brother;
-        if (pre_n == root){
-            if(n == root->child){
+        if (pre_n == root)
+        {
+            if (n == root->child)
+            {
                 break;
             }
-            pre_n = root->child;   
+            pre_n = root->child;
         }
     }
     return pre_n;
@@ -100,16 +104,19 @@ void Set(node p, int x) // 'V'
     {
         p->brother = p;
     }
-    printf("set A[%d] to %d\n", ptr2loc(p,A), x);
+    printf("set A[%d] to %d\n", ptr2loc(p, A), x);
 }
 
-static void link(node f, node c){
+static void link(node f, node c)
+{
 
-    if (f->child == NULL){
+    if (f->child == NULL)
+    {
         f->child = c;
         c->brother = f;
     }
-    else{
+    else
+    {
         c->brother = f->child;
         f->child = c;
         f->child->v = abs(c->v);
@@ -118,50 +125,44 @@ static void link(node f, node c){
 }
 
 int Meld(heap q1, heap q2) // 'U'
-{ 
+{
     /*The Meld function is used to join two heaps, i.e., merge
 the two 'ROOTS' into a single tree. This function returns the root of the
 resulting tree.*/
     int root_index;
-    if (abs(q1->v) > abs(q2->v)){
+    if (abs(q1->v) > abs(q2->v))
+    {
         link(q2, q1);
-        printf("Swap A[%d] and A[%d]\n", ptr2loc(q1,A), ptr2loc(q2,A));
-        printf("Meld A[%d] A[%d]\n", ptr2loc(q2,A), ptr2loc(q1,A));
+        printf("Swap A[%d] and A[%d]\n", ptr2loc(q1, A), ptr2loc(q2, A));
+        printf("Meld A[%d] A[%d]\n", ptr2loc(q2, A), ptr2loc(q1, A));
         root_index = ptr2loc(q2, A);
-    } else{
+    }
+    else
+    {
         link(q1, q2);
-        printf("Meld A[%d] A[%d]\n", ptr2loc(q1,A), ptr2loc(q2,A));
+        printf("Meld A[%d] A[%d]\n", ptr2loc(q1, A), ptr2loc(q2, A));
         root_index = ptr2loc(q1, A);
     }
     return root_index;
 }
 
 int decreaseKey(node root, node n, int v) // 'R'
-{ 
-/*  
-    5: The respective pointer is altered, so that the
-sub-tree rooted at the node becomes separate from the original tree.
-    
-    6: Then the v value is decreased
-
-    7: In calling the Meld function the original root is used
-as first argument and the node (now also a root) as the second argument.
-    
-    8: In both cases the return value is the root of the resulting heap tree.
-
-    9: An important detail to consider is when the argument node is the only
-child of its parent node. In this case the respective child pointer should
-be set to NULL. */
+{
     int p;
-    if (root->v == n->v){
-        root->v = v;
+    if (root->v == n->v)
+    {
+        root->v = -v;
         p = ptr2loc(root, A);
-    }else if(n == root->child && root == n->brother){
+        return p;
+    }
+    else if (n == root->child && root == n->brother)
+    {
         root->child = NULL;
         n->v = v;
         p = ptr2loc(root, A);
     }
-    else{
+    else
+    {
         node pre_n = getHook(root, n);
         pre_n->brother = n->brother;
         n->v = v;
@@ -176,19 +177,44 @@ void M(node)
 { /*The Min function returns the absolute value of v for the cur-
 rent node. When the argument node is a root the result is the heap
 minimum value.
-}
+}*/
 
-void E(node root)
-{ /*The ExtractMin function removes the root node from the current
-heap. The function returns the, possibly new, identification of the
-resulting tree.
+int extractMin(node root) // 'E'
+{   
+    if (root == NULL || root->child == NULL) {
+        printf("Root has no children.\n");
+        return -1; 
+    }
+    printf("kiiiiiiiikkkkkkkkiiiiiiiii");
+
+    node fstNode = root->child;
+    node sndNode = fstNode->brother;
+    int fst_root_index, root_index, flag=0;
+    
+    while (fstNode != root || sndNode != NULL || sndNode != root)
+    {
+        if (0==flag){
+            fst_root_index = Meld(fstNode, sndNode);
+        }
+        flag += 1;
+
+        if(2<=flag){
+            root_index = Meld(fstNode, sndNode);
+            Meld(&A[fst_root_index], &A[root_index]);
+        }
+        fstNode = sndNode->brother;
+        sndNode = fstNode->brother;
+    }
+    root->child = NULL;
+    root->v = -1;
+    return fst_root_index;
 }
-*/
 
 int main()
 {
     FILE *f = fopen("heap_graph.dot", "w");
-    if (!f) {
+    if (!f)
+    {
         fprintf(stderr, "Failed to open graph file for writing.\n");
         return 1;
     }
@@ -199,7 +225,7 @@ int main()
     A = (struct node *)calloc(n, sizeof(struct node)); // A is a pointer to the struct nodes
     if (!A)
     {
-        fprintf(stderr, "memory allocation failed\n");
+        fprintf(stderr, "Memory allocation failed\n");
         return 1;
     }
 
@@ -211,7 +237,7 @@ int main()
     }
 
     char input;
-    int index, index1, index2, new_v;
+    int index, index1, index2, index3, new_v;
 
     while (scanf(" %c", &input) && input != 'X')
     { // _%c tells scanf to skip any whitespace characters before reading a character.
@@ -239,20 +265,21 @@ int main()
             int p = decreaseKey(&A[index1], &A[index2], new_v);
             printf("decKey A[%d] to %d\n", p, new_v);
             break;
+        case 'E': // extractMin
+            if (scanf("%d", &index3) != 1){
+                printf("Error");
+            }
+            printf("extractMin A[%d]\n", extractMin(&A[index]));
+            break;
         case 'M': // Min
             break;
-        case 'E': // ExtractMin
-            break;
-
-
-        // Add cases for other commands: P, U, R, M, E
         default:
             // Handle unknown command or consume extra characters
             break;
         }
     }
 
-    vizShow(f,n);
+    vizShow(f, n);
     fclose(f);
     free(A); // Free the array of pointers
 
