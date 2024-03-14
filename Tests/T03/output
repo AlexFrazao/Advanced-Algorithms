@@ -1,0 +1,96 @@
+Meld A[0] A[1]
+link A[1] as child of A[0]
+0
+Meld A[0] A[2]
+link A[2] as child of A[0]
+0
+Meld A[0] A[3]
+link A[3] as child of A[0]
+0
+Meld A[0] A[4]
+link A[4] as child of A[0]
+0
+Meld A[0] A[5]
+link A[5] as child of A[0]
+0
+Meld A[0] A[6]
+link A[6] as child of A[0]
+0
+Meld A[0] A[7]
+link A[7] as child of A[0]
+0
+Meld A[0] A[8]
+link A[8] as child of A[0]
+0
+Meld A[0] A[9]
+link A[9] as child of A[0]
+0
+Meld A[0] A[10]
+link A[10] as child of A[0]
+0
+Meld A[0] A[11]
+link A[11] as child of A[0]
+0
+Meld A[0] A[12]
+link A[12] as child of A[0]
+0
+Meld A[0] A[13]
+link A[13] as child of A[0]
+0
+Meld A[0] A[14]
+link A[14] as child of A[0]
+0
+Meld A[0] A[15]
+link A[15] as child of A[0]
+0
+node: 0 v: -1 child: 15 brother: -1 
+node: 1 v: -1 child: -1 brother: 0 
+extractMin A[0]
+Meld A[15] A[14]
+link A[14] as child of A[15]
+Meld A[13] A[12]
+link A[12] as child of A[13]
+Meld A[11] A[10]
+link A[10] as child of A[11]
+Meld A[9] A[8]
+link A[8] as child of A[9]
+Meld A[7] A[6]
+link A[6] as child of A[7]
+Meld A[5] A[4]
+link A[4] as child of A[5]
+Meld A[3] A[2]
+link A[2] as child of A[3]
+Meld A[15] A[13]
+link A[13] as child of A[15]
+Meld A[15] A[11]
+link A[11] as child of A[15]
+Meld A[15] A[9]
+link A[9] as child of A[15]
+Meld A[15] A[7]
+link A[7] as child of A[15]
+Meld A[15] A[5]
+link A[5] as child of A[15]
+Meld A[15] A[3]
+link A[3] as child of A[15]
+Meld A[15] A[1]
+link A[1] as child of A[15]
+15
+extractMin A[0]
+0
+Final configuration:
+node: 0 v: -1 child: -1 brother: -1 
+node: 1 v: 1 child: -1 brother: 3 
+node: 2 v: -1 child: -1 brother: 3 
+node: 3 v: 1 child: 2 brother: 5 
+node: 4 v: -1 child: -1 brother: 5 
+node: 5 v: 1 child: 4 brother: 7 
+node: 6 v: -1 child: -1 brother: 7 
+node: 7 v: 1 child: 6 brother: 9 
+node: 8 v: -1 child: -1 brother: 9 
+node: 9 v: 1 child: 8 brother: 11 
+node: 10 v: -1 child: -1 brother: 11 
+node: 11 v: 1 child: 10 brother: 13 
+node: 12 v: -1 child: -1 brother: 13 
+node: 13 v: 1 child: 12 brother: 14 
+node: 14 v: -1 child: -1 brother: 15 
+node: 15 v: -1 child: 1 brother: -1 

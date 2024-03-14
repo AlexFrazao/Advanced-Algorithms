@@ -1,0 +1,102 @@
+node: 1 v: -1 child: -1 brother: -1 
+node: 1 v: -1 child: -1 brother: -1 
+set A[1] to 12
+node: 1 v: -12 child: -1 brother: -1 
+decKey A[1] to 11
+1
+node: 1 v: -11 child: -1 brother: -1 
+extractMin A[1]
+1
+node: 1 v: -11 child: -1 brother: -1 
+set A[1] to 10
+node: 1 v: -10 child: -1 brother: -1 
+set A[13] to 9
+node: 13 v: -9 child: -1 brother: -1 
+set A[14] to 9
+node: 14 v: -9 child: -1 brother: -1 
+set A[14] to 8
+node: 14 v: -8 child: -1 brother: -1 
+Meld A[1] A[2]
+Swap A[1] and A[2]
+link A[1] as child of A[2]
+2
+Meld A[3] A[4]
+link A[4] as child of A[3]
+3
+Meld A[5] A[6]
+link A[6] as child of A[5]
+5
+Meld A[3] A[5]
+link A[5] as child of A[3]
+3
+Meld A[2] A[3]
+link A[3] as child of A[2]
+2
+node: 0 v: -1 child: -1 brother: -1 
+Meld A[7] A[8]
+link A[8] as child of A[7]
+7
+Meld A[9] A[10]
+link A[10] as child of A[9]
+9
+Meld A[11] A[12]
+link A[12] as child of A[11]
+11
+Meld A[9] A[11]
+link A[11] as child of A[9]
+9
+Meld A[7] A[9]
+link A[9] as child of A[7]
+7
+Meld A[15] A[7]
+link A[7] as child of A[15]
+15
+node: 15 v: -1 child: 7 brother: -1 
+node: 12 v: -1 child: -1 brother: 11 
+Meld A[2] A[15]
+link A[15] as child of A[2]
+2
+decKey A[1] to 7
+Meld A[2] A[1]
+link A[1] as child of A[2]
+2
+node: 1 v: 7 child: -1 brother: 15 
+node: 1 v: 7 child: -1 brother: 15 
+node: 15 v: 1 child: 7 brother: 3 
+node: 3 v: 1 child: 5 brother: 2 
+node: 2 v: -1 child: 1 brother: -1 
+value A[2]
+1
+node: 7 v: -1 child: 9 brother: 15 
+node: 13 v: -9 child: -1 brother: -1 
+node: 14 v: -8 child: -1 brother: -1 
+decKey A[1] to 6
+Meld A[2] A[1]
+link A[1] as child of A[2]
+2
+Meld A[13] A[14]
+Swap A[13] and A[14]
+link A[13] as child of A[14]
+14
+decKey A[13] to 7
+Meld A[14] A[13]
+Swap A[14] and A[13]
+link A[14] as child of A[13]
+13
+Final configuration:
+node: 0 v: -1 child: -1 brother: -1 
+node: 1 v: 6 child: -1 brother: 1 
+node: 2 v: -1 child: 1 brother: 15 
+node: 3 v: 1 child: 5 brother: 2 
+node: 4 v: -1 child: -1 brother: 3 
+node: 5 v: 1 child: 6 brother: 4 
+node: 6 v: -1 child: -1 brother: 5 
+node: 7 v: -1 child: 9 brother: 15 
+node: 8 v: -1 child: -1 brother: 7 
+node: 9 v: 1 child: 11 brother: 8 
+node: 10 v: -1 child: -1 brother: 9 
+node: 11 v: 1 child: 12 brother: 10 
+node: 12 v: -1 child: -1 brother: 11 
+node: 13 v: -7 child: 14 brother: 14 
+node: 14 v: -8 child: -1 brother: 13 
+node: 15 v: 1 child: 7 brother: 3 

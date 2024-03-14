@@ -109,7 +109,6 @@ void Set(node p, int x) // 'V'
 
 static void link(node f, node c)
 {
-
     if (f->child == NULL)
     {
         f->child = c;
@@ -122,70 +121,71 @@ static void link(node f, node c)
         f->child->v = abs(c->v);
     }
     printf("link A[%d] as child of A[%d]\n", ptr2loc(c, A), ptr2loc(f, A));
+    printf("%d\n", ptr2loc(f,A));
 }
 
 int Meld(heap q1, heap q2) // 'U'
 {
-    /*The Meld function is used to join two heaps, i.e., merge
-the two 'ROOTS' into a single tree. This function returns the root of the
-resulting tree.*/
     int root_index;
     if (abs(q1->v) > abs(q2->v))
     {
-        link(q2, q1);
+        printf("Meld A[%d] A[%d]\n", ptr2loc(q1, A), ptr2loc(q2, A));
         printf("Swap A[%d] and A[%d]\n", ptr2loc(q1, A), ptr2loc(q2, A));
-        printf("Meld A[%d] A[%d]\n", ptr2loc(q2, A), ptr2loc(q1, A));
+        link(q2, q1);
         root_index = ptr2loc(q2, A);
     }
     else
     {
-        link(q1, q2);
         printf("Meld A[%d] A[%d]\n", ptr2loc(q1, A), ptr2loc(q2, A));
+        link(q1, q2);
         root_index = ptr2loc(q1, A);
     }
     return root_index;
 }
 
-int decreaseKey(node root, node n, int v) // 'R'
+void decreaseKey(node root, node n, int v) // 'R'
 {
-    int p;
+    int p=-1;
     if (root->v == n->v)
     {
         root->v = -v;
         p = ptr2loc(root, A);
-        return p;
+        printf("decKey A[%d] to %d\n", p, v);
+        printf("%d\n", p);
+        return;
     }
     else if (n == root->child && root == n->brother)
     {
         root->child = NULL;
-        n->v = v;
-        p = ptr2loc(root, A);
+        n->v = -v;
+        p = ptr2loc(n, A);
     }
     else
     {
         node pre_n = getHook(root, n);
         pre_n->brother = n->brother;
-        n->v = v;
-        p = ptr2loc(root, A);
+        n->v = -v;
+        p = ptr2loc(n, A);
     }
+    printf("decKey A[%d] to %d\n", p, v);
     Meld(root, n);
-    return p;
 }
 
-/*
-void M(node)
-{ /*The Min function returns the absolute value of v for the cur-
-rent node. When the argument node is a root the result is the heap
-minimum value.
-}*/
+
+void Min(node n) // 'M'
+{ 
+    printf("value A[%d]\n", ptr2loc(n, A));
+    int v = abs(n->v);
+    printf("%d\n", v);
+}
 
 int extractMin(node root) // 'E'
 {   
-    if (root == NULL || root->child == NULL) {
-        printf("Root has no children.\n");
-        return -1; 
+    if (root->child == NULL) {
+        //root->v = -1;
+        root->brother = NULL;
+        return ptr2loc(root, A); 
     }
-    printf("kiiiiiiiikkkkkkkkiiiiiiiii");
 
     node fstNode = root->child;
     node sndNode = fstNode->brother;
@@ -206,7 +206,7 @@ int extractMin(node root) // 'E'
         sndNode = fstNode->brother;
     }
     root->child = NULL;
-    root->v = -1;
+    //root->v = -1;
     return fst_root_index;
 }
 
@@ -237,9 +237,10 @@ int main()
     }
 
     char input;
-    int index, index1, index2, index3, new_v;
+    int index=-1, index1=-1, index2=-1, new_v=-1;
+    bool flag=false;
 
-    while (scanf(" %c", &input) && input != 'X')
+    while (scanf(" %c", &input) && flag != true)
     { // _%c tells scanf to skip any whitespace characters before reading a character.
         switch (input)
         {
@@ -257,21 +258,30 @@ int main()
             break;
         case 'U': // Meld
             scanf("%d %d", &index1, &index2);
-            int root = Meld(&A[index1], &A[index2]);
-            printf("The root of the resulting tree is A[%d]\n", root);
+            Meld(&A[index1], &A[index2]);
             break;
         case 'R': // decreaseKey
             scanf("%d %d %d", &index1, &index2, &new_v);
-            int p = decreaseKey(&A[index1], &A[index2], new_v);
-            printf("decKey A[%d] to %d\n", p, new_v);
+            decreaseKey(&A[index1], &A[index2], new_v);
             break;
         case 'E': // extractMin
-            if (scanf("%d", &index3) != 1){
-                printf("Error");
+            if (scanf("%d", &index) != 1){
+                printf("Error scanning node number.");
             }
-            printf("extractMin A[%d]\n", extractMin(&A[index]));
+            printf("extractMin A[%d]\n%d\n", extractMin(&A[index]), index);
             break;
         case 'M': // Min
+            if (scanf("%d", &index) != 1){
+                printf("Error scanning node number.");
+            }
+            Min(&A[index]);
+            break;
+        case 'X':
+            printf("Final configuration:\n");
+            for (int i=0; i < n; i++){
+                showNode(&A[i]);
+                }
+                flag = true;
             break;
         default:
             // Handle unknown command or consume extra characters
