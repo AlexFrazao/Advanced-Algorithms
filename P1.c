@@ -87,9 +87,12 @@ void showList(node current) // 'P'
 {
     // When called is supposed to display the child and all the brothers, if any.
     while (current != NULL)
-    {
+    {   
         showNode(current);
         current = current->brother;
+        if (current->v < 0) {
+            break;
+        }
     }
 }
 
@@ -178,8 +181,9 @@ void decreaseKey(node root, node n, int v) // 'R'
 void Min(node n) // 'M'
 { 
     printf("value A[%d]\n", ptr2loc(n, A));
-    int v = abs(n->v);
-    printf("%d\n", v);
+    n->v = abs(n->v);
+    int value = n->v;
+    printf("%d\n", value);
 }
 
 int extractMin(node root) // 'E'
