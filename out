@@ -63,7 +63,7 @@ link A[1] as child of A[2]
 node: 1 v: 7 child: -1 brother: 15 
 node: 1 v: 7 child: -1 brother: 15 
 node: 15 v: 1 child: 7 brother: 3 
-node: 3 v: 1 child: 5 brother: 2 
+node: 3 v: -1 child: 5 brother: 2 
 node: 2 v: -1 child: 1 brother: -1 
 value A[2]
 1
@@ -87,7 +87,7 @@ Final configuration:
 node: 0 v: -1 child: -1 brother: -1 
 node: 1 v: 6 child: -1 brother: 1 
 node: 2 v: -1 child: 1 brother: 15 
-node: 3 v: 1 child: 5 brother: 2 
+node: 3 v: -1 child: 5 brother: 2 
 node: 4 v: -1 child: -1 brother: 3 
 node: 5 v: 1 child: 6 brother: 4 
 node: 6 v: -1 child: -1 brother: 5 

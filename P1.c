@@ -164,6 +164,9 @@ void decreaseKey(node root, node n, int v) // 'R'
     {
         node pre_n = getHook(root, n);
         pre_n->brother = n->brother;
+        if (root == pre_n->brother){
+            pre_n->v = -pre_n->v;
+        }
         n->v = -v;
         p = ptr2loc(n, A);
     }
@@ -210,15 +213,27 @@ int extractMin(node root) // 'E'
     return fst_root_index;
 }
 
-int main()
-{
-    FILE *f = fopen("heap_graph.dot", "w");
+int graph_creator(char *name){
+    char namee[40];
+    static int counter=0;
+    counter++;
+    
+    sprintf(namee, "%d%s.dot", counter, name);
+    FILE *f = fopen(namee, "w");
     if (!f)
     {
         fprintf(stderr, "Failed to open graph file for writing.\n");
         return 1;
     }
+    vizShow(f, n);
+    fclose(f);
+    
+    //system("dot -Tpng heap_graph.dot -o heap_graph.png");
+    //system("xdg-open heap_graph.png");
+}
 
+int main()
+{
     scanf("%d", &n);
     getchar();
 
@@ -236,12 +251,12 @@ int main()
         A[i].brother = NULL;
     }
 
-    char input;
-    int index=-1, index1=-1, index2=-1, new_v=-1;
+    char input, name[40];
+    int index=-1, index1=-1, index2=-1, new_v=-1, counter=-1;
     bool flag=false;
 
     while (scanf(" %c", &input) && flag != true)
-    { // _%c tells scanf to skip any whitespace characters before reading a character.
+    {   
         switch (input)
         {
         case 'S': // showNode
@@ -251,6 +266,8 @@ int main()
         case 'V': // Set
             scanf("%d %d", &index, &new_v);
             Set(&A[index], new_v);
+            sprintf(name, "%c_%d_%d", input, index, new_v);
+            graph_creator(name);
             break;
         case 'P': // showList
             scanf("%d", &index);
@@ -259,22 +276,30 @@ int main()
         case 'U': // Meld
             scanf("%d %d", &index1, &index2);
             Meld(&A[index1], &A[index2]);
+            sprintf(name, "%c_%d_%d", input, index1, index2);
+            graph_creator(name);
             break;
         case 'R': // decreaseKey
             scanf("%d %d %d", &index1, &index2, &new_v);
             decreaseKey(&A[index1], &A[index2], new_v);
+            sprintf(name, "%c_%d_%d_%d", input, index1, index2, new_v);
+            graph_creator(name);
             break;
         case 'E': // extractMin
             if (scanf("%d", &index) != 1){
                 printf("Error scanning node number.");
             }
             printf("extractMin A[%d]\n%d\n", extractMin(&A[index]), index);
+            sprintf(name, "%c_%d", input, index);
+            graph_creator(name);
             break;
         case 'M': // Min
             if (scanf("%d", &index) != 1){
                 printf("Error scanning node number.");
             }
             Min(&A[index]);
+            sprintf(name, "%c_%d", input, index);
+            graph_creator(name);
             break;
         case 'X':
             printf("Final configuration:\n");
@@ -287,14 +312,8 @@ int main()
             // Handle unknown command or consume extra characters
             break;
         }
+    
     }
-
-    vizShow(f, n);
-    fclose(f);
     free(A); // Free the array of pointers
-
-    system("dot -Tpng heap_graph.dot -o heap_graph.png");
-    system("xdg-open heap_graph.png");
-
     return 0;
 }
