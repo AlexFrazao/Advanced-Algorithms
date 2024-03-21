@@ -85,13 +85,26 @@ void showNode(node v) // 'S'
 
 void showList(node current) // 'P'
 {
+    int flag = -1;
     // When called is supposed to display the child and all the brothers, if any.
-    while (current != NULL)
-    {   
+    if (current->child != NULL && current->brother == NULL)
+    {
         showNode(current);
-        current = current->brother;
-        if (current->v < 0) {
-            break;
+    }
+    else if (current->child == NULL && current->v < 0){
+        showNode(current);
+    }
+    else
+    {
+        while (current != NULL)
+        {
+            showNode(current);
+            current = current->brother;
+            if (current != NULL && current->v < 0)
+            {
+                showNode(current);
+                break;
+            }
         }
     }
 }
@@ -124,7 +137,7 @@ static void link(node f, node c)
         f->child->v = abs(c->v);
     }
     printf("link A[%d] as child of A[%d]\n", ptr2loc(c, A), ptr2loc(f, A));
-    printf("%d\n", ptr2loc(f,A));
+    printf("%d\n", ptr2loc(f, A));
 }
 
 int Meld(heap q1, heap q2) // 'U'
@@ -148,8 +161,8 @@ int Meld(heap q1, heap q2) // 'U'
 
 void decreaseKey(node root, node n, int v) // 'R'
 {
-    int p=-1;
-    if (root->v == n->v)
+    int p = -1;
+    if (root == n)
     {
         root->v = -v;
         p = ptr2loc(root, A);
@@ -160,52 +173,67 @@ void decreaseKey(node root, node n, int v) // 'R'
     else if (n == root->child && root == n->brother)
     {
         root->child = NULL;
+        n->brother = NULL;
         n->v = -v;
         p = ptr2loc(n, A);
     }
     else
     {
         node pre_n = getHook(root, n);
-        pre_n->brother = n->brother;
-        if (root == pre_n->brother){
-            pre_n->v = -pre_n->v;
+        if (n == pre_n->child)
+        {
+            pre_n->child = n->brother;
+            n->brother = NULL;
+            n->v = -v;
         }
-        n->v = -v;
+        else
+        {
+            if (root == n->brother)
+            {
+                pre_n->v = -pre_n->v;
+            }
+            pre_n->brother = n->brother;
+            n->brother = NULL;
+            n->v = -v;
+        }
         p = ptr2loc(n, A);
     }
     printf("decKey A[%d] to %d\n", p, v);
     Meld(root, n);
 }
 
-
 void Min(node n) // 'M'
-{ 
+{
     printf("value A[%d]\n", ptr2loc(n, A));
-    n->v = abs(n->v);
-    int value = n->v;
+    /* n->v = abs(n->v);
+    int value = n->v; */
+    int value = abs(n->v);
     printf("%d\n", value);
 }
 
 int extractMin(node root) // 'E'
-{   
-    if (root->child == NULL) {
-        //root->v = -1;
+{
+    if (root->child == NULL)
+    {
+        // root->v = -1;
         root->brother = NULL;
-        return ptr2loc(root, A); 
+        return ptr2loc(root, A);
     }
 
     node fstNode = root->child;
     node sndNode = fstNode->brother;
-    int fst_root_index, root_index, flag=0;
-    
+    int fst_root_index, root_index, flag = 0;
+
     while (fstNode != root || sndNode != NULL || sndNode != root)
     {
-        if (0==flag){
+        if (0 == flag)
+        {
             fst_root_index = Meld(fstNode, sndNode);
         }
         flag += 1;
 
-        if(2<=flag){
+        if (2 <= flag)
+        {
             root_index = Meld(fstNode, sndNode);
             Meld(&A[fst_root_index], &A[root_index]);
         }
@@ -213,15 +241,16 @@ int extractMin(node root) // 'E'
         sndNode = fstNode->brother;
     }
     root->child = NULL;
-    //root->v = -1;
+    // root->v = -1;
     return fst_root_index;
 }
 
-int graph_creator(char *name){
+int graph_creator(char *name)
+{
     char namee[40];
-    static int counter=0;
+    static int counter = 0;
     counter++;
-    
+
     sprintf(namee, "%d%s.dot", counter, name);
     FILE *f = fopen(namee, "w");
     if (!f)
@@ -231,9 +260,9 @@ int graph_creator(char *name){
     }
     vizShow(f, n);
     fclose(f);
-    
-    //system("dot -Tpng heap_graph.dot -o heap_graph.png");
-    //system("xdg-open heap_graph.png");
+
+    // system("dot -Tpng heap_graph.dot -o heap_graph.png");
+    // system("xdg-open heap_graph.png");
 }
 
 int main()
@@ -256,11 +285,11 @@ int main()
     }
 
     char input, name[40];
-    int index=-1, index1=-1, index2=-1, new_v=-1, counter=-1;
-    bool flag=false;
+    int index = -1, index1 = -1, index2 = -1, new_v = -1, counter = -1;
+    bool flag = false;
 
     while (scanf(" %c", &input) && flag != true)
-    {   
+    {
         switch (input)
         {
         case 'S': // showNode
@@ -290,7 +319,8 @@ int main()
             graph_creator(name);
             break;
         case 'E': // extractMin
-            if (scanf("%d", &index) != 1){
+            if (scanf("%d", &index) != 1)
+            {
                 printf("Error scanning node number.");
             }
             printf("extractMin A[%d]\n%d\n", extractMin(&A[index]), index);
@@ -298,25 +328,26 @@ int main()
             graph_creator(name);
             break;
         case 'M': // Min
-            if (scanf("%d", &index) != 1){
+            if (scanf("%d", &index) != 1)
+            {
                 printf("Error scanning node number.");
             }
             Min(&A[index]);
-            sprintf(name, "%c_%d", input, index);
-            graph_creator(name);
+            /* sprintf(name, "%c_%d", input, index);
+            graph_creator(name); */
             break;
         case 'X':
             printf("Final configuration:\n");
-            for (int i=0; i < n; i++){
+            for (int i = 0; i < n; i++)
+            {
                 showNode(&A[i]);
-                }
-                flag = true;
+            }
+            flag = true;
             break;
         default:
             // Handle unknown command or consume extra characters
             break;
         }
-    
     }
     free(A); // Free the array of pointers
     return 0;
